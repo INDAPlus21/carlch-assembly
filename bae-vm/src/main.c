@@ -6,6 +6,7 @@
 #include "../include/parser.h"
 #include "../include/token.h"
 #include "../include/compiler.h"
+#include "../include/runtime.h"
 
 int main(int argc, char** argv) {
     if(argc < 3) {
@@ -17,6 +18,7 @@ int main(int argc, char** argv) {
         printf("DEBUG\n");
     #endif
 
+    // Compile
     if(strcmp(argv[1], "compile") == 0) {
         char* source = read_ascii_file(argv[2]);
         TokenList tokens;
@@ -44,7 +46,24 @@ int main(int argc, char** argv) {
 
         token_list_destory(&tokens);
         free(source);
+
+        return 0;
     }
 
-    return 0;
+    // Runtime flow
+    else if(strcmp(argv[1], "run") == 0) {
+        uint8_t* code = read_binary_file(argv[2]);
+
+        Runtime runtime;
+        runtime.code = code;
+        runtime_start(&runtime);
+
+        if(runtime.status == RUNTIME_ERROR)
+            return 1;
+
+        return runtime.exit;
+    }
+
+    // If this happens, you have royaly fucked up
+    return 1;
 }
