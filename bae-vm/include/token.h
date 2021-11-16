@@ -17,11 +17,6 @@ enum _TokenInst {
 };
 typedef enum _TokenInst TokenInst;
 
-enum _TokenRegister {
-    EAX = 1,
-};
-typedef enum _TokenRegister TokenRegister;
-
 struct _Token {
     int type;
     int data;

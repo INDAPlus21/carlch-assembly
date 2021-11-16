@@ -18,6 +18,5 @@ typedef enum _ParserStatus ParserStatus;
 ParserStatus parser_start(TokenList* list, char* source);
 uint32_t parser_get_number(char* buf);
 TokenInst parser_get_inst(char* buf);
-TokenRegister parser_get_reg(const char* buf);
 
 #endif

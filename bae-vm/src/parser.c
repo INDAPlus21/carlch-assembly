@@ -28,17 +28,6 @@ ParserStatus parser_start(TokenList* list, char* source) {
             token_list_add(list, token);
         }
 
-        else if(lex[0] == '%') {
-            int reg = parser_get_reg(lex);
-            if(reg >= 0) {
-                token_create(&token, REGISTER, reg, line);
-                token_list_add(list, token);
-            } else {
-                printf("Syntax error at %d : '%s'\n", line, lex);
-                return PARSER_SYNTAX_ERROR;
-            }
-        }
-
         // Get instruction
         else {
             int inst = parser_get_inst(lex);
@@ -83,10 +72,4 @@ TokenInst parser_get_inst(char* buf) {
     if(strcmp(buf, "STOP") == 0)
         return STOP;
     return (TokenInst)-1;
-}
-
-TokenRegister parser_get_reg(const char* buf) {
-    if(strcmp(buf, "%eax") == 0)
-        return EAX;
-    return (TokenRegister)-1;
 }

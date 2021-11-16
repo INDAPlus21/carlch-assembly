@@ -12,19 +12,4 @@ enum _Bytecode {
 };
 typedef enum _Bytecode Bytecode;
 
-enum _Register {
-    R_NULL = 0x00,
-    R_1,
-    R_2,
-    R_3,
-    R_4
-    R_5,
-    R_6,
-    R_7,
-    R_PC,
-    R_COND,
-    R_COUNT
-};
-typedef enum _Register Regsiter;
-
 #endif
