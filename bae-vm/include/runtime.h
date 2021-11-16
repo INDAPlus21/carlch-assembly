@@ -13,9 +13,6 @@ enum _RuntimeStatus {
 };
 typedef enum _RuntimeStatus RuntimeStatus;
 
-typedef struct _Register Register;
-struct _Register {};
-
 struct _Runtime {
     uint8_t* code;
     RuntimeStatus status;

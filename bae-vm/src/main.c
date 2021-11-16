@@ -36,14 +36,13 @@ int main(int argc, char** argv) {
 
         write_binary_file("a.bout", comp.bytecode);
 
-        byte_buffer_destroy(comp.bytecode);
-
         // TODO Remove for debug
         for(int i = 0; i < tokens.ptr; i++) {
             Token* t = token_list_get(&tokens, i);
             printf("%d, %d, %d\n", t->type, t->data, t->line);
         }
 
+        byte_buffer_destroy(comp.bytecode);
         token_list_destory(&tokens);
         free(source);
 

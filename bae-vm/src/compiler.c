@@ -8,13 +8,26 @@ void compiler_start(Compiler* c) {
 
         if(t->type == INST) {
             switch (t->data) {
+                case MOV:
+                    if((token_list_get(c->tokens, i + 1)->type == REGISTER) && (token_list_get(c->tokens, i + 2)->type == NUMBER)) {
+                            byte_buffer_write_8(c->bytecode, REG_MOV);
+                            byte_buffer_write_8(c->bytecode, token_list_get(c->tokens, i + 1)->data);
+                            byte_buffer_write_32(c->bytecode, token_list_get(c->tokens, i + 2)->data);
+                            i += 2;
+                    } else {
+                        printf("Invalid register move at line %d\n", t->line);
+                        c->status = COMPILER_ERROR;
+                        return;
+                    }
+                    break;
+
                 case PUSH:
                     if(token_list_get(c->tokens, i + 1)->type == NUMBER) {
                         byte_buffer_write_8(c->bytecode, OP_PUSH_CONST);
                         byte_buffer_write_32(c->bytecode, token_list_get(c->tokens, i + 1)->data);
                         i++;
                     } else {
-                        printf("Invalid PUSH inst\n");
+                        printf("Invalid PUSH at line %d\n", t->line);
                         c->status = COMPILER_ERROR;
                         return;
                     }

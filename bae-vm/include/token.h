@@ -5,15 +5,22 @@
 
 enum _TokenType {
     INST,
-    NUMBER
+    NUMBER,
+    REGISTER
 };
 
 enum _TokenInst {
+    MOV,
     PUSH,
     ADD,
     STOP
 };
 typedef enum _TokenInst TokenInst;
+
+enum _TokenRegister {
+    EAX = 1,
+};
+typedef enum _TokenRegister TokenRegister;
 
 struct _Token {
     int type;
@@ -22,18 +29,18 @@ struct _Token {
 };
 typedef struct _Token Token;
 
-Token* token_create(int type, int data, int line);
+void token_create(Token* tok, int type, int data, int line);
 void token_destory(Token* tok);
 
 struct _TokenList {
-    Token** data;
+    Token* data;
     int ptr;
     int size;
 };
 typedef struct _TokenList TokenList;
 
 void token_list_create(TokenList* list, int size);
-void token_list_add(TokenList* list, Token* tok);
+void token_list_add(TokenList* list, Token tok);
 Token* token_list_get(TokenList* list, int index);
 void token_list_destory(TokenList* list);
 
