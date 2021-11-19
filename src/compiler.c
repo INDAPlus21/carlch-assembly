@@ -165,7 +165,7 @@ void compiler_start(Compiler* c) {
                 }
 
                 case M_LOOP: {
-                    if(token_list_get(c->tokens, i + 1)->type == REGISTER && token_list_get(c->tokens, i + 1)->type == REGISTER && token_list_get(c->tokens, i + 1)->type == VALUE) {
+                    if(token_list_get(c->tokens, i + 1)->type == REGISTER && token_list_get(c->tokens, i + 2)->type == REGISTER && token_list_get(c->tokens, i + 3)->type == VALUE) {
                         // move variable in R_a0, R_a1 to stack
                         byte_buffer_write(c->bytecode, 0b10101000); // move a0
                         push(c);                                     // push to stack
@@ -192,6 +192,12 @@ void compiler_start(Compiler* c) {
                         byte_buffer_write(c->bytecode, 0b10001001);
                         pop(c);
                         byte_buffer_write(c->bytecode, 0b10001000);
+
+                        int jumps = token_list_get(c->tokens, i + 3)->data;
+                        jumps += 20;
+                        byte_buffer_write(c->bytecode, jumps);
+
+                        jmp(c, (i + 2));
                     } else {
                         printf("[%d] : Invalid instruction!\n", tok->line);
                         c->status = COMPILER_ERROR;
