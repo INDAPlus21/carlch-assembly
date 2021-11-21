@@ -27,6 +27,7 @@ int main(int argc, char** argv) {
         if(r.status == RUNTIME_ERROR)
             return 1;
 
+        printf("Program succesfully terminated.\n");
         return 0;
     }
 

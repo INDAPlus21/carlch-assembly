@@ -34,5 +34,7 @@ void sub(Compiler* c);
 void push(Compiler* c);
 void pop(Compiler* c);
 void ext(Compiler* c);
+void prt(Compiler* c);
+void lbl(Compiler* c, int i);
 
 #endif

@@ -43,3 +43,12 @@ void pop(Compiler* c) {
 void ext(Compiler* c) {
     byte_buffer_write(c->bytecode, OP_EXT);
 }
+
+void prt(Compiler *c) {
+    byte_buffer_write(c->bytecode, OP_PRT);
+}
+
+void lbl(Compiler *c, int i) {
+    uint8_t instData = ((OP_LBL << 4)) | token_list_get(c->tokens, i + 1)->data;
+    byte_buffer_write(c->bytecode, instData);
+}

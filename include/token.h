@@ -22,14 +22,20 @@ enum _Instructions {
     PUSH,
     SUB,
     EXT,
+    PRT,
+    LBL,
 
     // MACROS
     M_MOVE,
     M_LOAD,
     M_ADD,
+    M_ADDI,
+    M_SUB,
+    M_SUBI,
     M_PUSH,
     M_POP,
     M_LOOP,
+    M_PRINT,
 };
 
 typedef struct _Token Token;

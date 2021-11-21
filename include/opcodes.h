@@ -59,7 +59,10 @@ enum _Operations {
     OP_PUSH     = 0b11000010,
     OP_POP      = 0b11000011,
 
+    OP_LBL      = 0b1110,
+
     OP_EXT      = 0b11111111,
+    OP_PRT      = 0b11111110,
 };
 
 // enum _Type { };

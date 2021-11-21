@@ -86,18 +86,32 @@ Instructions parser_get_inst(char* buffer) {
             return EXT;
         case SKP:
             return SKP;
+        case PRT:
+            return PRT;
+        case LBL:
+            return LBL;
+
+        // MACROS
         case M_MOVE:
             return M_MOVE;
         case M_LOAD:
             return M_LOAD;
         case M_ADD:
             return M_ADD;
+        case M_ADDI:
+            return M_ADDI;
+        case M_SUB:
+            return M_SUB;
+        case M_SUBI:
+            return M_SUBI;
         case M_PUSH:
             return M_PUSH;
         case M_POP:
             return M_POP;
         case M_LOOP:
             return M_LOOP;
+        case M_PRINT:
+            return M_PRINT;
 
         default:
             return (Instructions)-1;
@@ -120,14 +134,20 @@ Instructions lexer(char* s) {
         {"JUMP", JMP},
         {"EXIT", EXT},
         {"SKIP", SKP},
+        {"PRT", PRT},
+        {"LABEL", LBL},
 
         // MACROS
         {"M_MOVE", M_MOVE},
         {"M_LOAD", M_LOAD},
         {"M_ADD", M_ADD},
+        {"M_ADDI", M_ADDI},
+        {"M_SUB", M_SUB},
+        {"M_SUBI", M_SUBI},
         {"M_PUSH", M_PUSH},
         {"M_POP", M_POP},
         {"M_LOOP", M_LOOP},
+        {"M_PRINT", M_PRINT},
         {NULL, NULL}
     };
     struct entry_s* p = inst_table;

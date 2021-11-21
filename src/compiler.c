@@ -73,7 +73,7 @@ void compiler_start(Compiler* c) {
                     byte_buffer_write(c->bytecode, OP_SUB);
                     break;
                 }
-
+    
                 case PUSH: {
                     byte_buffer_write(c->bytecode, OP_PUSH);
                     break;
@@ -89,18 +89,33 @@ void compiler_start(Compiler* c) {
                     break;
                 }
 
+                case PRT: {
+                    byte_buffer_write(c->bytecode, OP_PRT);
+                    break;
+                }
+                case LBL: {
+                    if(token_list_get(c->tokens, i + 1)->type == VALUE) {
+                        uint8_t lblData = ((OP_LBL << 4)) | token_list_get(c->tokens, i + 1)->data;
+                        byte_buffer_write(c->bytecode, lblData);
+                        i++;
+                    } else {
+                        printf("[%d] : Invalid instruction!\n", tok->line);
+                        c->status = COMPILER_ERROR;
+                        return;
+                    }
+                    break;
+                }
+
                 // MACROS
 
                 case M_MOVE: {
                     if(token_list_get(c->tokens, i + 1)->type == REGISTER && token_list_get(c->tokens, i + 2)->type == REGISTER) {
                         unld(c, i);
                         push(c);
-                        i++;
-                        unld(c, i);
-                        load(c, -2);
-                        pop(c);
+                        unld(c, i + 1);
                         load(c, i);
-                        i++;
+                        pop(c);
+                        i += 2;
                     } else {
                         printf("[%d] : Invalid instruction!\n", tok->line);
                         c->status = COMPILER_ERROR;
@@ -140,6 +155,60 @@ void compiler_start(Compiler* c) {
                     break;
                 }
 
+                case M_ADDI: {
+                    if(token_list_get(c->tokens, i + 1)->type == REGISTER && token_list_get(c->tokens, i + 2)->type == REGISTER && token_list_get(c->tokens, i + 3)->type == VALUE) {
+                        unld(c, i + 1);
+                        byte_buffer_write(c->bytecode, 0b10000100);
+                        deposit(c, i + 2);
+                        byte_buffer_write(c->bytecode, 0b10000101);
+                        add(c);
+                        byte_buffer_write(c->bytecode, 0b10100011);
+                        load(c, i);
+                        i += 3;
+                    } else {
+                        printf("[%d] : Invalid instruction!\n", tok->line);
+                        c->status = COMPILER_ERROR;
+                        return;
+                    }
+                    break;
+                }
+
+                case M_SUB: {
+                    if(token_list_get(c->tokens, i + 1)->type == REGISTER && token_list_get(c->tokens, i + 2)->type == REGISTER && token_list_get(c->tokens, i + 3)->type == REGISTER) {
+                        unld(c, i + 1);
+                        byte_buffer_write(c->bytecode, 0b10000100);
+                        unld(c, i + 2);
+                        byte_buffer_write(c->bytecode, 0b10000101);
+                        sub(c);
+                        byte_buffer_write(c->bytecode, 0b10100011);
+                        load(c, i);
+                        i += 3;
+                    } else {
+                        printf("[%d] : Invalid instruction!\n", tok->line);
+                        c->status = COMPILER_ERROR;
+                        return;
+                    }
+                    break;
+                }
+
+                case M_SUBI: {
+                    if(token_list_get(c->tokens, i + 1)->type == REGISTER && token_list_get(c->tokens, i + 2)->type == REGISTER && token_list_get(c->tokens, i + 3)->type == VALUE) {
+                        unld(c, i + 1);
+                        byte_buffer_write(c->bytecode, 0b10000100);
+                        deposit(c, i + 2);
+                        byte_buffer_write(c->bytecode, 0b10000101);
+                        sub(c);
+                        byte_buffer_write(c->bytecode, 0b10100011);
+                        load(c, i);
+                        i += 3;
+                    } else {
+                        printf("[%d] : Invalid instruction!\n", tok->line);
+                        c->status = COMPILER_ERROR;
+                        return;
+                    }
+                    break;
+                }
+
                 case M_PUSH: {
                     if(token_list_get(c->tokens, i + 1)->type == REGISTER) {
                         unld(c, i);
@@ -168,24 +237,36 @@ void compiler_start(Compiler* c) {
                     if(token_list_get(c->tokens, i + 1)->type == REGISTER && token_list_get(c->tokens, i + 2)->type == REGISTER && token_list_get(c->tokens, i + 3)->type == VALUE) {
                         // move variable in R_a0, R_a1 to stack
                         byte_buffer_write(c->bytecode, 0b10101000); // move a0
-                        push(c);                                     // push to stack
+                        push(c);                                    // push to stack
                         byte_buffer_write(c->bytecode, 0b10101001); // move a1
-                        push(c);                                     // push to stack
+                        push(c);                                    // push to stack
 
                         unld(c, i);                                 // Fetch value from first input val
                         byte_buffer_write(c->bytecode, 0b10001000); // Load value into a0
                         unld(c, i + 1);                             // Fetch value from second input val
                         byte_buffer_write(c->bytecode, 0b10001001); // Load value into a1
 
-                        skp(c);                                     // Call skip operator
+                        byte_buffer_write(c->bytecode, 0b10100100); // Unload current val from o0 to lv
+                        push(c);
+                        byte_buffer_write(c->bytecode, 0b10100101); // Unload current val from o1 to lv
+                        push(c);
 
                         byte_buffer_write(c->bytecode, 0b10101001); // unload value from a1
-                        byte_buffer_write(c->bytecode, 0b10100100); // Load into register o0
+                        byte_buffer_write(c->bytecode, 0b10000100); // Load into register o0
                         byte_buffer_write(c->bytecode, 0b00000001); // Deposit 1 into lv register
-                        byte_buffer_write(c->bytecode, 0b10000101); // Load into register o1
+                        byte_buffer_write(c->bytecode, 0b10000101); // Load into register o1 
                         sub(c);                                     // Subtract by one
-                        byte_buffer_write(c->bytecode, 0b10100011); // Load result into lv register
-                        load(c, i + 1);                              // Load lv (result) into second argument register 
+                        byte_buffer_write(c->bytecode, 0b10100011); // Unload result
+                        load(c, i + 1);                             // Load lv (result) into second register
+
+                        pop(c);
+                        byte_buffer_write(c->bytecode, 0b10000101);
+                        pop(c);
+                        byte_buffer_write(c->bytecode, 0b10000100);
+
+                        skp(c);      
+                        
+                        jmp(c, i + 2);                               // Call skip operator
 
                         // move back variable to registers
                         pop(c);
@@ -193,11 +274,23 @@ void compiler_start(Compiler* c) {
                         pop(c);
                         byte_buffer_write(c->bytecode, 0b10001000);
 
-                        int jumps = token_list_get(c->tokens, i + 3)->data;
-                        jumps += 20;
-                        byte_buffer_write(c->bytecode, jumps);
+                        i += 3;
 
-                        jmp(c, (i + 2));
+                        // jmp(c, (i + 2));
+                    } else {
+                        printf("[%d] : Invalid instruction!\n", tok->line);
+                        c->status = COMPILER_ERROR;
+                        return;
+                    }
+                    break;
+                }
+
+                case M_PRINT: {
+                    if(token_list_get(c->tokens, i + 1)->type == REGISTER) {
+                        push(c);
+                        unld(c, i);
+                        prt(c);
+                        pop(c);
                     } else {
                         printf("[%d] : Invalid instruction!\n", tok->line);
                         c->status = COMPILER_ERROR;
