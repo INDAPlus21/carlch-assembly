@@ -1,4 +1,0 @@
-MOV %eax #30
-ADD %eax #12
-PUSH %eax
-STOP
